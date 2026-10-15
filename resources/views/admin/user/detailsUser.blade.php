@@ -56,7 +56,7 @@ Details sur le Fournisseur
                                 <h2 class="align-centre">Details du Fournisseur</h2>
                                 <hr>
                                 <p class="text-muted mb-4">
-                                    {!! $vendor->v_desc !!} 
+                                    {!! \App\Support\RichText::sanitize($vendor->v_desc) !!}
                                 </p>
                                 <hr>
                                

@@ -8,9 +8,15 @@ use App\Models\Vendor;
 use App\Models\Patient;
 use App\Models\Employee;
 use App\Models\Surgery;
+use App\Support\ImageUpload;
 
 class BlocController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:admin,doctor,surgery');
+    }
+
     
     // fonctions bloc operatoire
     public function addBlocPatientPage(){
@@ -116,7 +122,7 @@ class BlocController extends Controller
             'eqp_name' => 'required|string',
             'vendor_id' => 'required|exists:vendors,id',
             'eqp_qty' => 'required|string',
-            'eqp_dpic' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'eqp_dpic' => ImageUpload::RULES,
             'eqp_code' => 'required|string|max:8',
             'eqp_desc' => 'required|string',
         ]);
@@ -131,28 +137,7 @@ class BlocController extends Controller
         $equipement->eqp_status = "Working";
         $equipement->eqp_desc = $validatedData['eqp_desc'];
 
-        // Vérification si une photo a été téléchargée
-        if ($request->file('eqp_dpic')) {
-            $fileNameWithExt = $request->file('eqp_dpic')->getClientOriginalName();
-
-            $fileName = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-
-            $ext = $request->file('eqp_dpic')->getClientOriginalExtension(); 
-
-            $fileNameToStore = $fileName.'_'.time().'.'.$ext;
-
-            // Déplacement du fichier téléchargé vers le dossier de stockage
-            $path = $request->file('eqp_dpic')->storeAs('public/equipements', $fileNameToStore);
-            
-            // Stockage du nom de fichier dans la base de données
-            $equipement->eqp_dpic = $fileNameToStore;
-        } else {
-            // Utilisation d'une image par défaut si aucune image n'est téléchargée
-            $equipement->eqp_dpic = "nolabimage.jpeg";
-        }
-
-        // Enregistrement de l'équipement dans la base de données
-        $equipement->save();
+        ImageUpload::save($equipement, 'eqp_dpic', $request->file('eqp_dpic'), 'equipements', 'nolabimage.jpeg');
 
         // Redirection avec un message de succès
         return redirect()->route('manage.equipement.bloc')->with("status", "L'équipement a été ajouté avec succès");

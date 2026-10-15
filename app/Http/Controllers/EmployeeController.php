@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Support\ImageUpload;
 use App\Models\Employee;
 
 class EmployeeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:admin');
+    }
+
     //    
     public function addEmployeePage(){ return view('admin.employee.addEmployee'); }
 
@@ -61,29 +66,10 @@ class EmployeeController extends Controller
             'doc_fname' => 'required|string', 
             'doc_lname' => 'required|string',
             'doc_email' => 'required|string',
-            'doc_dpic' => 'nullable|image|max:2000',
+            'doc_dpic' => ImageUpload::RULES,
         ]);
     
-        $fileNameToStore;
-
-        $employee = Employee::find($id);
-    
-        if ($request->file('doc_dpic')) {
-            $fileNameWithExt = $request->file('doc_dpic')->getClientOriginalName();
-    
-            $fileName = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-    
-            $ext = $request->file('doc_dpic')->getClientOriginalExtension(); 
-    
-            $fileNameToStore = $fileName.'_'.time().'.'.$ext;
-
-            // Suprrimer l'ancienne image
-            Storage::delete("public/employeeProfiles/$employee->doc_dpic");
-    
-            $path = $request->file('doc_dpic')->storeAs('public/employeeProfiles', $fileNameToStore);
-
-            $employee->doc_dpic = $fileNameToStore;
-        }
+        $employee = Employee::findOrFail($id);
     
     
         $employee->doc_fname = $request->input('doc_fname');
@@ -91,7 +77,7 @@ class EmployeeController extends Controller
         $employee->doc_email = $request->input('doc_email');
 
 
-        $employee->update();
+        ImageUpload::save($employee, 'doc_dpic', $request->file('doc_dpic'), 'employeeProfiles', 'noimage.jpeg');
     
         return back()->with("status", "L'employé(e) a été modifié(e) avec succès"); 
     }
@@ -102,36 +88,18 @@ class EmployeeController extends Controller
             'doc_fname' => 'required|string', 
             'doc_lname' => 'required|string',
             'doc_email' => 'required|string|unique:employees,doc_email',
-            'doc_dpic' => 'nullable|image|max:2000',
+            'doc_dpic' => ImageUpload::RULES,
         ]);
     
-        $fileNameToStore;
-        // il faudra creer un lien symbolique pour que laravel accede publiquement
-        // à l'image avec la commande php artisan storage:link
-        if ($request->file('doc_dpic')) {
-            $fileNameWithExt = $request->file('doc_dpic')->getClientOriginalName();
-    
-            $fileName = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-    
-            $ext = $request->file('doc_dpic')->getClientOriginalExtension(); 
-    
-            $fileNameToStore = $fileName.'_'.time().'.'.$ext;
-    
-            $path = $request->file('doc_dpic')->storeAs('public/employeeProfiles', $fileNameToStore); // Correction de la variable $fileNameToStore
-        } else {
-            $fileNameToStore = "noimage.jpeg";
-        }
-        
     
         $employee = new Employee();
     
         $employee->doc_fname = $request->input('doc_fname');
         $employee->doc_lname = $request->input('doc_lname');
         $employee->doc_email = $request->input('doc_email');
-        $employee->doc_dpic = $fileNameToStore;
     
         $employee->doc_number = strtoupper(substr(uniqid(), -5));
-        $employee->save();
+        ImageUpload::save($employee, 'doc_dpic', $request->file('doc_dpic'), 'employeeProfiles', 'noimage.jpeg');
         
     
         return back()->with("status", "L'employé(e) a été enregistré avec succès"); 
@@ -146,11 +114,10 @@ class EmployeeController extends Controller
 
     // Suppression d'un employé de la base
     public function deleteEmployee($id){ 
-        $employee = Employee::find($id);
+        $employee = Employee::findOrFail($id);
         $name = $employee->doc_fname.' '.$employee->doc_lname;
-        // Suprrimer l'ancienne image
-        Storage::delete("public/employeeProfiles/$employee->doc_dpic");
         $employee->delete(); 
+        ImageUpload::delete('employeeProfiles', $employee->doc_dpic);
 
         return back()->with("status", "L'employé $name a été supprimé avec succès");
     }

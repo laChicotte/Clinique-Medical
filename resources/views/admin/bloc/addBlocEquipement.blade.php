@@ -87,7 +87,7 @@
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="inputCity" class="col-form-label">Photo de l'Equipement</label>
-                                    <input type="file" name="eqp_dpic" class="btn btn-success form-control"  id="inputCity">        
+                                    <input type="file" name="eqp_dpic" accept="image/jpeg,image/png,image/gif" class="btn btn-success form-control"  id="inputCity">
                                 </div>  
                                 <div class="form-group col-md-6">
                                     <label for="inputPassword4" class="col-form-label">Equipment Code Barre(EAN-8)</label>

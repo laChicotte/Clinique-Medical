@@ -8,6 +8,11 @@ use App\Models\Product;
 
 class InventoryController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:admin');
+    }
+
     // fonctions inventaire
     public function inventoryProductPage(){ 
 

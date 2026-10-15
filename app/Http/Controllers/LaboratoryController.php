@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Support\ImageUpload;
 use App\Models\Patient;
 use App\Models\Laboratory;
 use App\Models\Equipement;
@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\Auth;
 
 class LaboratoryController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:admin,doctor,laboratory');
+    }
+
     
     public function labPatientTestPage()
     { 
@@ -41,7 +46,7 @@ class LaboratoryController extends Controller
     {
         // Valider les données du formulaire
         $request->validate([
-            'lab_pat_results' => 'required',
+            'lab_pat_results' => 'required|string',
         ]);
 
         // Créer une nouvelle laboratory
@@ -61,7 +66,7 @@ class LaboratoryController extends Controller
         // Valider les données du formulaire
         $request->validate([
             'patient_id' => 'required|exists:patients,id',
-            'lab_pat_tests' => 'required',
+            'lab_pat_tests' => 'required|string',
         ]);
 
         // Créer une nouvelle laboratory
@@ -85,7 +90,6 @@ class LaboratoryController extends Controller
     // fonctions laboratoires
     public function labDetailsEquipementPage($id){ 
         // Récupérer les équipements où le département est "Laboratory"
-        // $img = Storage::url('equipements/' . $equipement->eqp_dpic);
         $equipement = Equipement::with('vendor')->find($id);
         return view('admin.labo.labDetailsEquipement', compact('equipement')); 
     }
@@ -204,14 +208,14 @@ class LaboratoryController extends Controller
             'eqp_name' => 'required|string',
             'vendor_id' => 'required|exists:vendors,id',
             'eqp_qty' => 'required|integer',
-            'eqp_dpic' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'eqp_dpic' => ImageUpload::RULES,
             'eqp_code' => 'required|string|max:8',
             'eqp_desc' => 'required|string',
             'eqp_status' => 'required|string',
         ]);
 
         // Création d'un nouvel équipement
-        $equipement = Equipement::find($id);
+        $equipement = Equipement::findOrFail($id);
         $equipement->eqp_name = $validatedData['eqp_name'];
         $equipement->vendor_id = $validatedData['vendor_id'];
         $equipement->eqp_qty = $validatedData['eqp_qty'];
@@ -219,31 +223,7 @@ class LaboratoryController extends Controller
         $equipement->eqp_status = $validatedData['eqp_status'];
         $equipement->eqp_desc = $validatedData['eqp_desc'];
 
-        // Vérification si une photo a été téléchargée
-        if ($request->file('eqp_dpic')) {
-            $fileNameWithExt = $request->file('eqp_dpic')->getClientOriginalName();
-
-            $fileName = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-
-            $ext = $request->file('eqp_dpic')->getClientOriginalExtension(); 
-
-            $fileNameToStore = $fileName.'_'.time().'.'.$ext;
-
-            // Suprrimer l'ancienne image
-            Storage::delete("public/equipements/$equipement->eqp_dpic");
-
-            // Déplacement du fichier téléchargé vers le dossier de stockage
-            $path = $request->file('eqp_dpic')->storeAs('public/equipements', $fileNameToStore);
-            
-            // Stockage du nom de fichier dans la base de données
-            $equipement->eqp_dpic = $fileNameToStore;
-        } else {
-            // Utilisation d'une image par défaut si aucune image n'est téléchargée
-            $equipement->eqp_dpic = "nolabimage.jpeg";
-        }
-
-        // Enregistrement de l'équipement dans la base de données
-        $equipement->update();
+        ImageUpload::save($equipement, 'eqp_dpic', $request->file('eqp_dpic'), 'equipements', 'nolabimage.jpeg');
 
         // Redirection avec un message de succès
         return back()->with("status", "L'équipement a été mis à jour avec succès");
@@ -257,7 +237,7 @@ class LaboratoryController extends Controller
             'eqp_name' => 'required|string',
             'vendor_id' => 'required|exists:vendors,id',
             'eqp_qty' => 'required|string',
-            'eqp_dpic' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'eqp_dpic' => ImageUpload::RULES,
             'eqp_code' => 'required|string|max:8',
             'eqp_desc' => 'required|string',
         ]);
@@ -272,28 +252,7 @@ class LaboratoryController extends Controller
         $equipement->eqp_status = "Working";
         $equipement->eqp_desc = $validatedData['eqp_desc'];
 
-        // Vérification si une photo a été téléchargée
-        if ($request->file('eqp_dpic')) {
-            $fileNameWithExt = $request->file('eqp_dpic')->getClientOriginalName();
-
-            $fileName = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-
-            $ext = $request->file('eqp_dpic')->getClientOriginalExtension(); 
-
-            $fileNameToStore = $fileName.'_'.time().'.'.$ext;
-
-            // Déplacement du fichier téléchargé vers le dossier de stockage
-            $path = $request->file('eqp_dpic')->storeAs('public/equipements', $fileNameToStore);
-            
-            // Stockage du nom de fichier dans la base de données
-            $equipement->eqp_dpic = $fileNameToStore;
-        } else {
-            // Utilisation d'une image par défaut si aucune image n'est téléchargée
-            $equipement->eqp_dpic = "nolabimage.jpeg";
-        }
-
-        // Enregistrement de l'équipement dans la base de données
-        $equipement->save();
+        ImageUpload::save($equipement, 'eqp_dpic', $request->file('eqp_dpic'), 'equipements', 'nolabimage.jpeg');
 
         // Redirection avec un message de succès
         return back()->with("status", "L'équipement a été ajouté avec succès");
@@ -301,12 +260,10 @@ class LaboratoryController extends Controller
 
     public function deleteEquipement($id){
         // Recherche de l'équipement à supprimer
-        $equipement = Equipement::find($id);
-        
-        // Suprrimer l'ancienne image
-        Storage::delete("public/equipements/$equipement->eqp_dpic");
+        $equipement = Equipement::findOrFail($id);
         // Suppression de l'équipement
         $equipement->delete();
+        ImageUpload::delete('equipements', $equipement->eqp_dpic);
     
         // Redirection avec un message de succès
         return back()->with("status", "L'équipement a été supprimé avec succès");

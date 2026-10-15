@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
+    protected $casts = ['phar_desc' => \App\Casts\SanitizedHtml::class];
     protected $fillable = ['phar_name', 'phar_bcode', 'phar_desc', 'phar_qty', 'category_id'];
 
     // Relation avec la catégorie

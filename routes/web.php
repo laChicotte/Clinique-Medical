@@ -37,7 +37,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/admin-logOut', [AdminController::class, 'adminLogOutPage'])->name('logoutAdmin');
     Route::get('users/add-user', [AdminController::class, 'addUserPage'])->name('addUser');
     Route::get('users/manage-user', [AdminController::class, 'manageUserPage'])->name('manageUser');
-    Route::get('users/saveUser/{id}', [AdminController::class, 'saveUser']);
+    Route::post('users/saveUser/{id}', [AdminController::class, 'saveUser'])->name('user.store');
     Route::delete('user/delete/{id}', [AdminController::class, 'deleteUser'])->name('user.delete');
     Route::post('user/change/{id}', [AdminController::class, 'changePasswordUser'])->name('user.cpwd');
     

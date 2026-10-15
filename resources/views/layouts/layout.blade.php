@@ -184,6 +184,7 @@
                                 </a>
                                 
                             </li>
+                            @if(in_array(Auth::user()->role, ['admin', 'doctor', 'laboratory', 'surgery'], true))
                             <li>
                                 <a href="javascript: void(0);">
                                     <i class="fab fa-accessible-icon "></i>
@@ -214,6 +215,8 @@
                                 </ul>
                             </li>
 
+                            @endif
+                            @if(Auth::user()->role == 'admin')
                             <li>
                                 <a href="javascript: void(0);">
                                     <i class="mdi mdi-doctor"></i>
@@ -239,6 +242,7 @@
 
 
                             
+                            @endif
                             <li>
                                 <a href="javascript: void(0);">
                                     <i class="mdi mdi-pill"></i>
@@ -248,7 +252,7 @@
                                 <ul class="nav-second-level" aria-expanded="false">
 
                                     {{-- pour cette partie seul le Dr et les pharmaciens --}}
-                                    @if(Auth::user()->role == "admin" || Auth::user()->role == "pharmacie")
+                                    @if(in_array(Auth::user()->role, ['admin', 'pharmacy', 'pharmacie'], true))
 
                                         <li>
                                             <a href="{{ url('catProducts/add-catProduct') }}">Ajouter une Catégorie de Prod</a>
@@ -289,7 +293,7 @@
                             </li>
                             
 
-                            @if(Auth::user()->role == "admin" || Auth::user()->role == "comptable")
+                            @if(in_array(Auth::user()->role, ['admin', 'accounting', 'comptable'], true))
                             {{-- Pour la comptabilité seul les comptables et le Dr y ont acces --}}
                             {{-- <li>
                                 <a href="javascript: void(0);">
@@ -361,6 +365,7 @@
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul class="nav-second-level" aria-expanded="false">
+                                    @if(in_array(Auth::user()->role, ['admin', 'doctor'], true))
                                     <li>
                                         <a href="{{ url('record/record-inPatient') }}">Dossiers d'Hospitalisation</a>
                                     </li>
@@ -370,19 +375,24 @@
                                     <li>
                                         <a href="{{ url('record/record-employee') }}">Dossiers des Employés</a>
                                     </li>
+                                    @endif
+                                    @if(in_array(Auth::user()->role, ['admin', 'pharmacy', 'pharmacie'], true))
                                     <li>
                                         <a href="{{ url('record/record-product') }}">Dossiers Pharmaceutiques</a>
                                     </li>
+                                    @endif
                                     {{-- <li>
                                         <a href="{{ url('record/record-account') }}">Comptabilité</a>
                                     </li> --}}
+                                    @if(in_array(Auth::user()->role, ['admin', 'doctor'], true))
                                     <li>
                                         <a href="{{ url('record/record-medical') }}">Dossiers Médicaux</a>
                                     </li>
+                                    @endif
                                     
                                 </ul>
                             </li>
-                            @if(Auth::user()->role == "admin" || Auth::user()->role == "doctor")
+                            @if(in_array(Auth::user()->role, ['admin', 'doctor', 'laboratory'], true))
                             {{-- <li>
                                 <a href="javascript: void(0);">
                                     <i class="fe-file-text"></i>
@@ -431,6 +441,8 @@
                                 </ul>
                             </li>
 
+                            @endif
+                            @if(in_array(Auth::user()->role, ['admin', 'doctor', 'surgery'], true))
                             <li>
                                 <a href="javascript: void(0);">
                                     <i class="mdi mdi-scissors-cutting "></i>

@@ -59,7 +59,7 @@ Détails de l'ordonnance
                                     <h2 class="align-centre">Prescription</h2>
                                     <hr>
                                     <p class="text-muted mb-4">
-                                       {!! $prescription->pres_ins !!}
+                                       {!! \App\Support\RichText::sanitize($prescription->pres_ins) !!}
                                     </p> 
                                    
                                 </div>

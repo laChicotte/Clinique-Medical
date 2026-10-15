@@ -56,12 +56,12 @@
                                 <h2 class="align-centre">Laboratory Test</h2>
                                 <hr>
                                 <p class="text-muted mb-4">
-                                    {!! $tests->lab_pat_tests !!}
+                                    {!! \App\Support\RichText::sanitize($tests->lab_pat_tests) !!}
                                 </p>
                                 <hr>
                                 <h2 class="align-centre">Laboratory Result</h2>
                                 <p class="text-muted mb-4">
-                                    {!! $tests->lab_pat_results !!}
+                                    {!! \App\Support\RichText::sanitize($tests->lab_pat_results) !!}
                                 </p>
                                     <hr>
                                  

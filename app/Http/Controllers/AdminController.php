@@ -13,10 +13,26 @@ use App\Models\Product;
 use App\Models\Laboratory;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 
 
 class AdminController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:admin')->only([
+            'addUserPage', 'manageUserPage', 'saveUser', 'deleteUser',
+            'managePasswordResetPage',
+        ]);
+        $this->middleware('role:admin,accounting,comptable')->only([
+            'addAccountPayPage', 'manageAccountPayPage',
+            'addAccountRecevPage', 'manageAccountRecevPage',
+        ]);
+        $this->middleware('role:admin,doctor')->only(['addRecordPage', 'manageRecordPage']);
+    }
+
     // Definition des chemins pour les dashboard
     public function viewHomePage(){ 
         return view('admin.home');
@@ -25,7 +41,8 @@ class AdminController extends Controller
 
     public function addUserPage(){ 
         $employees = Employee::where('has_account', 0)->get();
-        return view('admin.user.addUser', compact('employees'));         
+        return response()->view('admin.user.addUser', compact('employees'))
+            ->header('Cache-Control', 'no-store, private');
     }
 
     public function manageUserPage(){ 
@@ -34,39 +51,41 @@ class AdminController extends Controller
         return view('admin.user.manageUser', compact('users'));        
     }
 
-    public function saveUser( $id){ 
-    
-        // Trouver l'employé par ID
-        $employee = Employee::find($id);
+    public function saveUser($id)
+    {
+        return DB::transaction(function () use ($id) {
+            $employee = Employee::lockForUpdate()->find($id);
 
-        // Vérifier si l'employé existe
-        if (!$employee) {
-            return back()->with("echec", "L'employé n'a pas été trouvé.");
-        }
-
-        // Activer le compte de l'employé
-        if ($employee->has_account === 0) {
-            if($employee->doc_dept == null){
-                return back()->with("echec", "Cet(te) employé(e) n'a pas de département");
+            if (!$employee) {
+                return back()->with('echec', "L'employé n'a pas été trouvé.");
             }
-            // Créer un utilisateur ou mettre à jour les informations selon vos besoins
-            $data = [
+
+            if ((int) $employee->has_account !== 0
+                || User::where('employee_id', $employee->id)->exists()) {
+                return back()->with('echec', "Cet employé a déjà un compte.");
+            }
+
+            if (!$employee->doc_dept) {
+                return back()->with('echec', "Cet employé n'a pas de département.");
+            }
+
+            $password = Str::password(20);
+
+            (new User())->forceFill([
                 'name' => $employee->doc_lname,
                 'email' => $employee->doc_email,
-                'employee_id' => strval($employee->id),
+                'employee_id' => (string) $employee->id,
                 'role' => $employee->doc_dept,
-                'password' => Hash::make("motdepasse"),
-            ];
-            User::factory()->create($data);
-            
-            
+                'password' => Hash::make($password),
+            ])->save();
+
             $employee->has_account = 1;
             $employee->save();
 
-            return back()->with("status", "L'utilisateur a été enregistré avec succès");
-        } else {
-            return back()->with("echec", "Echec de l'enregistrement, vérifier si l'utilisateur a déjà un compte.");
-        }
+            return redirect()->route('addUser')
+                ->with('status', "L'utilisateur a été enregistré avec succès.")
+                ->with('new_account', ['email' => $employee->doc_email, 'password' => $password]);
+        });
     }
 
     public function deleteUser($id){
@@ -89,10 +108,14 @@ class AdminController extends Controller
 
     public function changePasswordUser(Request $request, $id)
     {
+        // Each user can change only their own password, regardless of role.
+        abort_unless((string) $request->user()->id === (string) $id, 403);
+
         // Valider les champs
         $request->validate([
-            'new_pwd' => 'required',
-            'old_pwd' => 'required'
+            'new_pwd' => ['required', 'string', 'max:72', 'different:old_pwd', Password::min(12)->letters()->numbers()],
+            'confirm_pwd' => ['required', 'string', 'same:new_pwd'],
+            'old_pwd' => ['required', 'string'],
         ]);
 
         // Trouver l'utilisateur par son id
@@ -108,6 +131,8 @@ class AdminController extends Controller
             $user->update([
                 'password' => Hash::make($request->new_pwd)
             ]);
+
+            $request->session()->regenerate();
 
             return back()->with("status", "Mot de passe modifié avec succès");
         } else {
@@ -158,6 +183,7 @@ class AdminController extends Controller
         $infos = $request->only('email', 'password');
     
         if(Auth::attempt($infos)){
+            $request->session()->regenerate();
             return redirect()->intended(route('dashboard'));
         }
     

@@ -6,6 +6,13 @@
 
 
 @section('content')
+@if (session('new_account'))
+    <div class="alert alert-warning" role="alert">
+        <p>Compte créé pour <strong>{{ session('new_account.email') }}</strong>.</p>
+        <p>Mot de passe initial : <code>{{ session('new_account.password') }}</code></p>
+        <p class="mb-0">Ce mot de passe est affiché une seule fois. Transmettez-le directement à la personne concernée ; elle pourra le changer depuis son profil.</p>
+    </div>
+@endif
 {{-- affichage de l'alert en ca de succes --}}
 @if (Session::has('status'))
     <input type="hidden" name="" id="message" value="{{Session::get('status')}}">
@@ -90,7 +97,12 @@
                                         <td>{{ $e->doc_lname }}</td> 
                                         <td>{{ $e->doc_dept }}</td> 
                                         <td>{{ $e->doc_email }}</td> 
-                                        <td><a href="{{ url('users/saveUser', [$e->id]) }}" class="badge badge-success"><i class=" fas fa-file-signature"></i>nouvel user</a></td>
+                                        <td>
+                                            <form method="POST" action="{{ route('user.store', $e->id) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-success">Créer le compte</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                     </tbody>
                                 @endforeach

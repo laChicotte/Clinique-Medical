@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Laboratory extends Model
 {
     use HasFactory;
+    protected $casts = [
+        'lab_pat_tests' => \App\Casts\SanitizedHtml::class,
+        'lab_pat_results' => \App\Casts\SanitizedHtml::class,
+    ];
     protected $fillable = [
         'patient_id',
         'lab_pat_tests',

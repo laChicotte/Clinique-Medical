@@ -5,6 +5,15 @@ Profil de l'Administrateur System
 @endsection  
 
 @section('content')
+@if ($errors->any())
+    <div class="alert alert-danger" role="alert">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 @if (Session::has('status'))
     <input type="hidden" name="" id="message" value="{{Session::get('status')}}">
     <script type="text/javascript">
@@ -131,20 +140,20 @@ Profil de l'Administrateur System
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="old_pwd">Ancien Mot de Passe</label>
-                                            <input type="password" class="form-control" name="old_pwd" placeholder="Entrer l'ancien mot de passe" required>
+                                            <input type="password" class="form-control" name="old_pwd" autocomplete="current-password" placeholder="Entrer l'ancien mot de passe" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="new_pwd">Nouveau Mot de Passe</label>
-                                            <input type="password" class="form-control" name="new_pwd" placeholder="Entrer le nouveau mot de passe" required>
+                                            <input type="password" class="form-control" name="new_pwd" minlength="12" maxlength="72" autocomplete="new-password" placeholder="Au moins 12 caractères, avec lettres et chiffres" required>
                                         </div>
                                     </div> <!-- end col -->
                                 </div> <!-- end row -->
                         
                                 <div class="form-group">
                                     <label for="confirm_pwd">Confirmer le Nouveau Mot de Passe</label>
-                                    <input type="password" class="form-control" name="confirm_pwd" placeholder="Confirmer le nouveau mot de passe" required>
+                                    <input type="password" class="form-control" name="confirm_pwd" minlength="12" maxlength="72" autocomplete="new-password" placeholder="Confirmer le nouveau mot de passe" required>
                                 </div>
                         
                                 <div class="text-right">

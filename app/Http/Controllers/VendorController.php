@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 
 class VendorController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:admin');
+    }
+
 
     // Fonction fournisseurs
     public function addVendorPage(){ return view('admin.vendor.addVendor'); }

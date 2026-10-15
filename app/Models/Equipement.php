@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Equipement extends Model
 {
     use HasFactory;
+    protected $casts = ['eqp_desc' => \App\Casts\SanitizedHtml::class];
     protected $fillable = [
         'eqp_code', 'eqp_name', 'eqp_desc', 'eqp_dept', 'eqp_qty', 'eqp_status', 'eqp_dpic', 'vendor_id',
     ];

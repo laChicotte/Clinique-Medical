@@ -85,7 +85,7 @@ Editer Prod Catégorie
                             <div class="form-group">
                                 <label for="inputAddress" class="col-form-label">Description de la Catégorie Pharmaceutique</label>
                                 <textarea required="required" type="text" class="form-control" name="pharm_cat_desc" id="editor">
-                                    {{$category->pharm_cat_desc}}
+                                    {{ \App\Support\RichText::sanitize($category->pharm_cat_desc) }}
                                 </textarea>
                             </div>
 

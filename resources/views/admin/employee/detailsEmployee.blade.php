@@ -33,7 +33,7 @@ Details sur l'employé
                 <div class="card-box text-center">
 
                     {{-- <img src="{{ asset('storage/app/public/employeeProfiles/'.$employee->doc_dpic) }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image"> --}}
-                    <img src="{{ url('storage/app/public/employeeProfiles/' . $employee->doc_dpic) }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                    <img src="{{ asset('storage/employeeProfiles/' . $employee->doc_dpic) }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
                     
                     
 

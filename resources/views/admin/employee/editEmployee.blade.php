@@ -87,7 +87,7 @@ Editer Employé(e)
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="inputCity" class="col-form-label">Photo profil</label>
-                                    <input type="file" name="doc_dpic" class="btn btn-success form-control"  id="inputCity">
+                                    <input type="file" name="doc_dpic" accept="image/jpeg,image/png,image/gif" class="btn btn-success form-control"  id="inputCity">
                                 </div>
                             </div>                                            
 

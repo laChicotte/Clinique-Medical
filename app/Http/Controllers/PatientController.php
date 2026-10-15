@@ -6,6 +6,16 @@ use Illuminate\Http\Request;
 
 class PatientController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:admin')->only([
+            'managePatientPage', 'editPatientPage', 'updatePatient', 'deletePatient',
+        ]);
+        $this->middleware('role:admin,doctor,laboratory,surgery')->except([
+            'managePatientPage', 'editPatientPage', 'updatePatient', 'deletePatient',
+        ]);
+    }
+
     public function addPatientPage(){ return view('admin.patient.addPatient'); }
     public function freePatientPage(){ return view('admin.patient.freePatient'); }
 

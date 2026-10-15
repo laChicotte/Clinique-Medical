@@ -8,6 +8,11 @@ use App\Models\Payroll;
 
 class PayrollController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:admin,accounting,comptable');
+    }
+
     // Fonction Salaires
     public function addPayrollPage(){ 
         $employees = Employee::get();

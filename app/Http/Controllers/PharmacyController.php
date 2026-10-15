@@ -11,6 +11,18 @@ use Illuminate\Support\Facades\Auth;
 
 class PharmacyController extends Controller
 {
+    public function __construct()
+    {
+        $prescriptionMethods = [
+            'addPrescriptionPage', 'addDetailsPrescriptionPage', 'savePrescription',
+            'showPrescription', 'editPrescriptionPage', 'updatePrescription',
+            'deletePrescription', 'managePrescriptionPage', 'allPrescriptionPage',
+        ];
+
+        $this->middleware('role:admin,doctor')->only($prescriptionMethods);
+        $this->middleware('role:admin,pharmacy,pharmacie')->except($prescriptionMethods);
+    }
+
     public function addCatProductPage()
     {
         // Récupérer la liste des fournisseurs
@@ -273,7 +285,7 @@ class PharmacyController extends Controller
         // Valider les données du formulaire
         $request->validate([
             'patient_id' => 'required|exists:patients,id',
-            'pres_ins' => 'required',
+            'pres_ins' => 'required|string',
         ]);
 
         // Créer une nouvelle prescription
@@ -291,7 +303,7 @@ class PharmacyController extends Controller
     {
         // Valider les données du formulaire
         $request->validate([
-            'pres_ins' => 'required',
+            'pres_ins' => 'required|string',
         ]);
 
         // Créer une nouvelle prescription

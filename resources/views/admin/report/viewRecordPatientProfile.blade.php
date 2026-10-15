@@ -84,7 +84,7 @@ Rapport Patient
                                         <span class="timeline-sm-date">{{$presc->created_at->format('d-m-Y')}}</span>
                                         <h5 class="mt-0 mb-1">Ordonnace : {{$loop->iteration}} </h5>
                                         <p class="text-muted mt-2">
-                                            {!! $presc->pres_ins !!}    
+                                            {!! \App\Support\RichText::sanitize($presc->pres_ins) !!}
                                         </p>
                                     </li>                 
                                 @endforeach
@@ -133,7 +133,7 @@ Rapport Patient
                                         </h5>
                                         
                                         <p class="text-muted mt-2">
-                                            {!! $lab->lab_pat_tests!!}
+                                            {!! \App\Support\RichText::sanitize($lab->lab_pat_tests) !!}
                                         </p>
                                         <hr>
                                         <h5>
@@ -141,7 +141,7 @@ Rapport Patient
                                         </h5>
                                         
                                         <p class="text-muted mt-2">
-                                            {!! $lab->lab_pat_results!!}
+                                            {!! \App\Support\RichText::sanitize($lab->lab_pat_results) !!}
                                         </p>
                                         <hr>
                                 </li>

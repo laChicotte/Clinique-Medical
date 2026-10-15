@@ -77,7 +77,7 @@
                             <div class="form-row">
                                 <div class="form-group col-md-4">
                                     <label for="inputCity" class="col-form-label">Photo de l'Equipement</label>
-                                    <input type="file" name="eqp_dpic" class="btn btn-success form-control" id="inputCity">        
+                                    <input type="file" name="eqp_dpic" accept="image/jpeg,image/png,image/gif" class="btn btn-success form-control" id="inputCity">
                                 </div>  
                                 <div class="form-group col-md-4">
                                     <label for="vendor_id" class="col-form-label">Fournisseur</label>
@@ -107,7 +107,7 @@
                             <div class="form-group" >
                                 <label for="inputAddress" class="col-form-label">Description de l'équipement</label>
                                 <textarea required="required" type="text" class="form-control" name="eqp_desc" id="editor">
-                                    {!! $equipement->eqp_desc !!}
+                                    {{ \App\Support\RichText::sanitize($equipement->eqp_desc) }}
                                 </textarea>
                             </div>
 

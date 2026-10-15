@@ -53,7 +53,7 @@ Détails du produit
                                 <h4 class="text-danger">Pharmaceutical Description</h4>
 
                                 <p class="text-muted mb-4">
-                                    {!! $product->phar_desc !!}
+                                    {!! \App\Support\RichText::sanitize($product->phar_desc) !!}
                                 </p>
                                
                             </div>

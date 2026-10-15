@@ -46,7 +46,7 @@ Détails de la Catégorie
                                 <h6 class="text-danger">Fournisseur : {{ $category->vendor ? $category->vendor->v_name : 'N/A' }}</h6>
                                 <hr>
                                 <p class="text-muted mb-4">
-                                    {!! $category->pharm_cat_desc !!}
+                                    {!! \App\Support\RichText::sanitize($category->pharm_cat_desc) !!}
                                 </p>                                
                             </div>
                         </div> <!-- end col -->

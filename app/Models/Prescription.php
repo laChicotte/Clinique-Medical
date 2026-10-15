@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Prescription extends Model
 {
     use HasFactory;
+    protected $casts = ['pres_ins' => \App\Casts\SanitizedHtml::class];
     
     protected $fillable = ['pres_ins', 'patient_id', 'employee_id'];
 

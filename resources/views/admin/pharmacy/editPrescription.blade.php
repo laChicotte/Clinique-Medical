@@ -114,7 +114,7 @@ Gérer les ordonnances
                                 <div class="form-group">
                                         <label for="inputAddress" class="col-form-label">Ordonnance</label>
                                         <textarea required="required"  type="text" class="form-control" name="pres_ins" id="editor">
-                                            {!! $prescription->pres_ins !!}
+                                            {{ \App\Support\RichText::sanitize($prescription->pres_ins) }}
                                         </textarea>
                                 </div>
 

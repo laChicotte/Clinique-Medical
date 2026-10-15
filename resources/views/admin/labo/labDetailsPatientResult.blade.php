@@ -75,7 +75,7 @@
                             <hr>
                             <div class="form-group">
                                 <!-- Champ caché pour le contenu de Trix -->
-                                <input id="editor-input-1" type="hidden" name="lab_pat_tests" value="{!! $laboratory->lab_pat_tests !!}" required>
+                                <input id="editor-input-1" type="hidden" name="lab_pat_tests" value="{{ \App\Support\RichText::sanitize($laboratory->lab_pat_tests) }}" required>
                                 <label for="inputAddress" class="col-form-label">Examen demandé</label>
                                 <trix-editor input="editor-input-1" class="form-control" style="height: 111px;"></trix-editor>
                             </div>

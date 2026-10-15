@@ -11,6 +11,13 @@ use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:admin,pharmacy,pharmacie')->only('recordProductPage');
+        $this->middleware('role:admin,accounting,comptable')->only('recordAccountPage');
+        $this->middleware('role:admin,doctor')->except(['recordProductPage', 'recordAccountPage']);
+    }
+
     // fonctions Rapports
     public function recordInPatientPage()
     {

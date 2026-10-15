@@ -51,7 +51,7 @@
                                 <hr>
                                 <h4 class="text-danger">Description de L'équipement</h4>
                                 <p class="text-muted mb-4">
-                                    <p>{!! $equipement->eqp_desc !!}</p>                                                    
+                                    <p>{!! \App\Support\RichText::sanitize($equipement->eqp_desc) !!}</p>
                                 </p>
                                
                             </div>
